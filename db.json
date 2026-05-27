@@ -1,0 +1,40 @@
+{
+  "todoList": [
+    {
+      "userId": 1,
+      "title": "Приготовить тесто для пиццы",
+      "completed": false,
+      "id": 1
+    },
+    {
+      "userId": 1,
+      "id": 2,
+      "title": "Нарезать овощи для салата",
+      "completed": false
+    },
+    {
+      "userId": 1,
+      "title": "Запечь курицу с травами",
+      "completed": false,
+      "id": 3
+    },
+    {
+      "userId": 1,
+      "title": "Сварить соус болоньезе",
+      "completed": false,
+      "id": 4
+    },
+    {
+      "userId": 1,
+      "id": 5,
+      "title": "Подготовить ингредиенты для суши",
+      "completed": false
+    },
+    {
+      "userId": 1,
+      "id": 6,
+      "title": "Испечь шоколадный торт",
+      "completed": false
+    }
+  ]
+}

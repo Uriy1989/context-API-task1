@@ -1,0 +1,137 @@
+.block {
+	height: 20px;
+}
+
+.H3 {
+	background-color: antiquewhite;
+	padding: 5px 5px;
+	margin: 5px;
+}
+
+.app {
+	background: white;
+	max-width: 1200px;
+}
+
+.loader {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 25px;
+	height: 25px;
+	border: 5px solid gray;
+	border-radius: 50%;
+	border-left-color: transparent;
+	animation: loader 1s infinite;
+}
+
+@keyframes loader {
+	0% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
+}
+
+.containerTodoList {
+	display: flex; /* Включаем Flexbox */
+	align-items: center; /* Выравниваем элементы по вертикали */
+	justify-content: space-between; /* Распределяем элементы: текст слева, чекбокс справа */
+	background-color: antiquewhite;
+	border-radius: 2px;
+	border-width: 1px;
+	border-style: solid;
+	border-color: rgb(245, 217, 180);
+	padding: 5px 10px; /* Добавляем отступы внутри контейнера */
+	margin: 5px 0; /* Отступы между элементами списка */
+	/* transition: transform 0.3s ease; Плавный переход */
+}
+
+.containerTodoList:hover {
+	/* transform: translateX(10px); Сдвиг вправо на 10 px */
+	/* box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); Добавляем тень при наведении */
+}
+
+.Todo {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 100%;
+	background-color: #f8f4ee;
+	border-radius: 2px;
+	border-color: rgb(245, 217, 180);
+}
+
+.todoText {
+	flex: 1; /* Занимает всё доступное пространство слева */
+	font-size: 16px;
+	color: #333;
+	margin-right: 15px; /* Отступ между текстом и чекбоксом */
+}
+
+.checkbox {
+	display: flex;
+	align-items: center;
+	flex-shrink: 0; /* Не сжимаем блок с чекбоксом */
+	gap: 8px; /* Отступ между чекбоксом и текстом */
+}
+
+.checkbox input[type='checkbox'] {
+	width: 20px;
+	height: 20px;
+	cursor: pointer;
+	margin: 0; /* Убираем возможные стандартные отступы */
+}
+
+.sortIdOn {
+	background-color: rgb(245, 217, 180);
+}
+
+.sortIdOff {
+	background-color: #f8f4ee;
+	border-radius: 8px;
+	border: 2px solid rgb(245, 217, 180); /* Объединяем border-color и border в одно свойство */
+	transition: border-color 0.25s; /* Добавляем переход для плавности */
+}
+
+.sortIdOff:hover {
+	border-color: #f8f4ee; /* Цвет границы при наведении */
+}
+
+.todoButton {
+	background-color: rgb(245, 217, 180);
+	border-radius: 8px;
+	border: 2px solid rgb(250, 232, 209); /* Объединяем border и border-color */
+	padding: 0.4em 1.2em;
+	font-size: 1em;
+	font-weight: 500;
+	font-family: inherit;
+	cursor: pointer;
+	transition: border-color 0.25s;
+}
+
+.todoButton:hover {
+	border-color: #f8f4ee; /* Цвет границы при наведении */
+}
+
+.input {
+	background-color: rgb(245, 217, 180);
+	border-radius: 8px;
+	border: 2px solid rgb(250, 232, 209); /* Объединяем border и border-color */
+	padding: 0.4em 1.2em;
+	font-size: 1em;
+	font-weight: 500;
+	font-family: inherit;
+	transition: all 0.25s ease;
+	width: 100%;
+	box-sizing: border-box;
+	outline: none;
+}
+
+.input:focus {
+	border-color: rgb(255, 180, 100);
+	background-color: white;
+	box-shadow: 0 0 0 2px rgba(255, 180, 100, 0.3);
+}

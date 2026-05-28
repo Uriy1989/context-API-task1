@@ -1,11 +1,11 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import styles from './styles.module.css';
 
-import {
-	useRequestAddTodo,
-	useRequestDeleteTodo,
-	useRequestUpdateTodo,
-} from './hooks';
+import { useDebounce } from '@uidotdev/usehooks';
+
+import { useRequestAddTodo } from './hooks';
+
+import { ButtonSave, ButtonEdit, ButtonDelete, ButtonSort } from './buttons';
 
 import { TodoListProvider } from './provider/TodoListProvider';
 
@@ -18,56 +18,142 @@ export const TodoList = () => {
 	const [sortByTitle, setSortByTitle] = useState('');
 
 	const [isSave, setIsSave] = useState(false);
-	const [isLoading, setIsLoading] = useState(false);
+	const [isLoading, setIsLoading] = useState(true); //true
 
 	const [editingId, setEditingId] = useState(null);
 	const [editedTitle, setEditedTitle] = useState('');
+
+	const [isUpdating, setIsUpdating] = useState(false); //new
+
+	const [isDelete, setIsDelete] = useState(false);
+
+	const [error, setError] = useState(null);
 
 	const { isCreating, requestAddTodo, handleIsCreating } = useRequestAddTodo(
 		searchPhrase,
 		refreshTodoList,
 	);
 
-	const { isDelete, requestDeleteTodo } =
-		useRequestDeleteTodo(refreshTodoList);
+	//для серверной части
 
-	const { isUpdating, requestUpdateTodo } = useRequestUpdateTodo(
-		refreshTodoList,
-		todoList,
-	);
+	const debouncedSearchTerm = useDebounce(searchPhrase, 900);
 
-	const processTodoList = useMemo(() => {
-		//его заменяем на useEffect c запросами к серверу тоесть только который ниже с нашей добавкой
-		//useMemo проверить здесь useMemo или useEffect был
-		let result = [...todoList];
+	const getTodos = useCallback(async () => {
+		//обновляет функцию если что то изменилось из массива
+		setIsLoading(true);
+		let url = 'http://localhost:3003/todoList?';
 
-		if (result.length !== 0) {
-			result = result.filter((todo) =>
-				todo.title.toLowerCase().includes(searchPhrase.toLowerCase()),
+		if (debouncedSearchTerm) {
+			console.log('debouncedSearchTerm =', debouncedSearchTerm);
+			//можно через хук реакт роутера???
+			url += `q=${debouncedSearchTerm}`;
+		}
+
+		if (sortByTitle) {
+			//сортировка на сервере // сортировка должна работать по условию
+			url += `&_sort=title&_order=${sortByTitle}`;
+		}
+		//views это поля по которому сортируемся, ?_sort или
+
+		try {
+			const response = await fetch(url);
+			const data = await response.json();
+
+			setTodoList(data);
+			setIsLoading(false);
+		} catch (error) {
+			setIsLoading(false);
+		}
+	}, [debouncedSearchTerm, sortByTitle]); //похож на useEffect
+
+	const handleDelete = async (id) => {
+		//requestDeleteTodo(id);
+		setIsDelete(true);
+		try {
+			const response = await fetch(
+				`http://localhost:3003/todoList/${id}`,
+				{
+					method: 'DELETE',
+					headers: {
+						'Content-Type': 'application/json;charset=utf-8',
+					},
+				},
 			);
+
+			if (!response.ok) {
+				throw new Error('Network response was not ok');
+			}
+
+			setTodoList((prevState) =>
+				prevState.filter((todo) => todo.id !== id),
+			);
+
+			refreshTodoList();
+		} catch (error) {
+			setError(error.message);
+		} finally {
+			setIsDelete(false);
+		}
+	};
+
+	const handleSave = async (id, payload) => {
+		const originalTodo = todoList.find((todo) => todo.id === id);
+
+		if (!originalTodo) {
+			setEditingId(null);
+			//setEditedTitle('');
+			return;
+		}
+		if (editedTitle.trim() === '') {
+			//вместо этого сделать отмену два условия
+			console.log('Нельзя сохранить пустую задачу');
+			setIsSave(true);
+			return;
 		}
 
-		const sortedResult = [...result];
-
-		if (sortByTitle === 'asc') {
-			return sortedResult.sort((a, b) => a.title.localeCompare(b.title));
-		} else {
-			return sortedResult;
+		if (originalTodo.title === editedTitle) {
+			//вместо этого сделать отмену
+			console.log('Текст не изменился, выход из режима редактирования');
+			setEditingId(null);
+			return;
 		}
-	}, [searchPhrase, todoList, sortByTitle]);
+
+		setIsUpdating(true);
+
+		try {
+			const response = await fetch(
+				`http://localhost:3003/todoList/${id}`,
+				{
+					method: 'PATCH',
+					headers: {
+						'Content-Type': 'application/json;charset=utf-8',
+					},
+					body: JSON.stringify(payload),
+				},
+			);
+
+			if (!response.ok) {
+				throw new Error('Ошибка обновления');
+			}
+			const data = await response.json();
+
+			//refreshTodoList
+			setTodoList((prevState) =>
+				prevState.map((todo) => (todo.id === id ? data : todo)),
+			);
+
+			setEditingId(null);
+			setEditedTitle('');
+		} catch (error) {
+			setError(error.message);
+		} finally {
+			setIsUpdating(false);
+		}
+	};
 
 	useEffect(() => {
-		setIsLoading(true);
-		fetch('http://localhost:3003/todoList')
-			.then((loadedData) => loadedData.json())
-			.then((loadedTodoList) => {
-				setTodoList(loadedTodoList);
-			})
-			.catch((error) => {
-				console.log('Ошибка загрузки списка задач:', error);
-			})
-			.finally(() => setIsLoading(false));
-	}, [refreshTodoListFlag]);
+		getTodos();
+	}, [getTodos]);
 
 	const onSearchChange = ({ target }) => {
 		if (target.value.length < 1) {
@@ -107,31 +193,6 @@ export const TodoList = () => {
 		}
 	};
 
-	const handleSave = (id) => {
-		const originalTodo = todoList.find((todo) => todo.id === id);
-
-		if (!originalTodo) {
-			setEditingId(null);
-			setEditedTitle('');
-			return;
-		}
-		if (editedTitle.trim() === '') {
-			console.log('Нельзя сохранить пустую задачу');
-			setIsSave(true);
-			return;
-		}
-
-		if (originalTodo.title === editedTitle) {
-			console.log('Текст не изменился, выход из режима редактирования');
-			setEditingId(null);
-			return;
-		}
-
-		requestUpdateTodo(id, { title: editedTitle });
-		setEditingId(null);
-		setEditedTitle('');
-	};
-
 	const handleCompleted = (id, currentCompleted) => {
 		setTodoList((newList) =>
 			newList.map((todo) =>
@@ -144,14 +205,18 @@ export const TodoList = () => {
 		requestUpdateTodo(id, { completed: !currentCompleted });
 	};
 
-	const handleDelete = (id) => {
-		requestDeleteTodo(id);
-	};
-
 	const handleAdd = () => {
 		requestAddTodo();
 		setSearchPhrase('');
 	};
+
+	if (error) {
+		return (
+			<div>
+				<span>{error} что за ошибка</span>
+			</div>
+		);
+	}
 
 	return (
 		<TodoListProvider>
@@ -177,7 +242,7 @@ export const TodoList = () => {
 				{isLoading ? (
 					<div className={styles.loader}></div>
 				) : (
-					processTodoList?.map(({ id, title, completed }) => (
+					todoList?.map(({ id, title, completed }) => (
 						<div className={styles.containerTodoList} key={id}>
 							<div className={styles.Todo}>
 								{editingId === id ? (
@@ -195,32 +260,25 @@ export const TodoList = () => {
 								)}
 								<div className={styles.checkbox}>
 									{editingId === id ? (
-										<button
-											disabled={isSave}
-											onClick={() => handleSave(id)}
-											className={styles.todoButton}
-										>
-											Сохранить
-										</button>
+										<ButtonSave
+											id={id}
+											isSave={isSave}
+											handleSave={handleSave}
+											editedTitle={editedTitle}
+										/>
 									) : (
-										// <ButtonSave />
-										<button
-											disabled={isUpdating}
-											onClick={() => handleEdit(id)}
-											className={styles.todoButton}
-										>
-											Редактировать
-										</button>
-										// <ButtonEdit />
+										<ButtonEdit
+											id={id}
+											isUpdating={isUpdating}
+											handleEdit={handleEdit}
+										/>
 									)}
+									<ButtonDelete
+										id={id}
+										isDelete={isDelete}
+										handleDelete={handleDelete}
+									/>
 
-									<button
-										disabled={isDelete}
-										onClick={() => handleDelete(id)}
-										className={styles.todoButton}
-									>
-										Удалить
-									</button>
 									<input
 										type="checkbox"
 										checked={completed}
@@ -233,18 +291,11 @@ export const TodoList = () => {
 						</div>
 					))
 				)}
-				<button
-					onClick={() =>
-						handleTitle(sortByTitle === 'asc' ? 'desc' : 'asc')
-					}
-					className={
-						sortByTitle === 'asc'
-							? styles.sortIdOn
-							: styles.sortIdOff
-					}
-				>
-					Сортировка ↓
-				</button>
+
+				<ButtonSort
+					handleTitle={handleTitle}
+					sortByTitle={sortByTitle}
+				/>
 			</div>
 		</TodoListProvider>
 	);

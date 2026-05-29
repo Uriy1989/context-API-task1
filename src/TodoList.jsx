@@ -7,6 +7,8 @@ import { useRequestAddTodo } from './hooks';
 
 import { ButtonSave, ButtonEdit, ButtonDelete, ButtonSort } from './buttons';
 
+import { EditTask } from './components';
+
 import { TodoListProvider } from './provider/TodoListProvider';
 
 export const TodoList = () => {
@@ -21,9 +23,6 @@ export const TodoList = () => {
 	const [isLoading, setIsLoading] = useState(true); //true
 
 	const [editingId, setEditingId] = useState(null);
-	const [editedTitle, setEditedTitle] = useState('');
-
-	const [isUpdating, setIsUpdating] = useState(false); //new
 
 	const [isDelete, setIsDelete] = useState(false);
 
@@ -97,29 +96,6 @@ export const TodoList = () => {
 	};
 
 	const handleSave = async (id, payload) => {
-		const originalTodo = todoList.find((todo) => todo.id === id);
-
-		if (!originalTodo) {
-			setEditingId(null);
-			//setEditedTitle('');
-			return;
-		}
-		if (editedTitle.trim() === '') {
-			//вместо этого сделать отмену два условия
-			console.log('Нельзя сохранить пустую задачу');
-			setIsSave(true);
-			return;
-		}
-
-		if (originalTodo.title === editedTitle) {
-			//вместо этого сделать отмену
-			console.log('Текст не изменился, выход из режима редактирования');
-			setEditingId(null);
-			return;
-		}
-
-		setIsUpdating(true);
-
 		try {
 			const response = await fetch(
 				`http://localhost:3003/todoList/${id}`,
@@ -143,11 +119,8 @@ export const TodoList = () => {
 			);
 
 			setEditingId(null);
-			setEditedTitle('');
 		} catch (error) {
 			setError(error.message);
-		} finally {
-			setIsUpdating(false);
 		}
 	};
 
@@ -169,16 +142,7 @@ export const TodoList = () => {
 		setSearchPhrase(target.value);
 	};
 
-	const onEditChange = ({ target }) => {
-		const newTitle = target.value;
-
-		if (newTitle.trim() === '') {
-			setIsSave(true);
-		} else {
-			setIsSave(false);
-		}
-		setEditedTitle(newTitle);
-	};
+	const handleCancel = () => {};
 
 	const handleTitle = (order) => {
 		setSortByTitle(order);
@@ -213,7 +177,7 @@ export const TodoList = () => {
 	if (error) {
 		return (
 			<div>
-				<span>{error} что за ошибка</span>
+				<span>Ошибка: {error}</span>
 			</div>
 		);
 	}
@@ -246,39 +210,27 @@ export const TodoList = () => {
 						<div className={styles.containerTodoList} key={id}>
 							<div className={styles.Todo}>
 								{editingId === id ? (
-									<input
-										className={styles.input}
-										name="edit"
-										type="text"
-										placeholder="Внесите новую задачу"
-										value={editedTitle}
-										onChange={onEditChange}
-										autoFocus
+									<EditTask
+										id={id}
+										isSave={isSave}
+										handleSave={handleSave}
+										handleCancel={handleCancel}
 									/>
 								) : (
-									title
-								)}
-								<div className={styles.checkbox}>
-									{editingId === id ? (
-										<ButtonSave
-											id={id}
-											isSave={isSave}
-											handleSave={handleSave}
-											editedTitle={editedTitle}
-										/>
-									) : (
+									<div>
+										title
 										<ButtonEdit
 											id={id}
-											isUpdating={isUpdating}
 											handleEdit={handleEdit}
 										/>
-									)}
-									<ButtonDelete
-										id={id}
-										isDelete={isDelete}
-										handleDelete={handleDelete}
-									/>
-
+										<ButtonDelete //будем отменять вместо удалить
+											id={id}
+											isDelete={isDelete}
+											handleDelete={handleDelete}
+										/>
+									</div>
+								)}
+								<div className={styles.checkbox}>
 									<input
 										type="checkbox"
 										checked={completed}

@@ -2,13 +2,9 @@ import { useEffect, useState, useMemo, useCallback } from 'react';
 import styles from './styles.module.css';
 
 import { useDebounce } from '@uidotdev/usehooks';
-
 import { useRequestAddTodo } from './hooks';
-
 import { ButtonSave, ButtonEdit, ButtonDelete, ButtonSort } from './buttons';
-
 import { EditTask } from './components';
-
 import { TodoListProvider } from './provider/TodoListProvider';
 
 export const TodoList = () => {
@@ -19,11 +15,10 @@ export const TodoList = () => {
 	const [searchPhrase, setSearchPhrase] = useState('');
 	const [sortByTitle, setSortByTitle] = useState('');
 
-	const [isSave, setIsSave] = useState(false);
 	const [isLoading, setIsLoading] = useState(true); //true
 
-	const [editingId, setEditingId] = useState(null);
-
+	//const [isEdit, setIsEdit] = useState(false); //null editingId editingId
+	const [editingId, setEditingId] = useState(false);
 	const [isDelete, setIsDelete] = useState(false);
 
 	const [error, setError] = useState(null);
@@ -142,19 +137,16 @@ export const TodoList = () => {
 		setSearchPhrase(target.value);
 	};
 
-	const handleCancel = () => {};
+	const handleCancel = () => {
+		setEditingId(null);
+	};
 
 	const handleTitle = (order) => {
 		setSortByTitle(order);
 	};
 
 	const handleEdit = (id) => {
-		setEditingId(id);
-		const todoToEdit = todoList.find((todo) => todo.id === id);
-		if (todoToEdit) {
-			setEditedTitle(todoToEdit.title);
-			setIsSave(false);
-		}
+		setEditingId(id); //подумать как будет называться setIsEdit
 	};
 
 	const handleCompleted = (id, currentCompleted) => {
@@ -181,7 +173,7 @@ export const TodoList = () => {
 			</div>
 		);
 	}
-
+	//{ id, title, completed }
 	return (
 		<TodoListProvider>
 			<div className={styles.app}>
@@ -212,33 +204,36 @@ export const TodoList = () => {
 								{editingId === id ? (
 									<EditTask
 										id={id}
-										isSave={isSave}
+										title={title}
 										handleSave={handleSave}
 										handleCancel={handleCancel}
 									/>
 								) : (
-									<div>
-										title
-										<ButtonEdit
-											id={id}
-											handleEdit={handleEdit}
-										/>
-										<ButtonDelete //будем отменять вместо удалить
-											id={id}
-											isDelete={isDelete}
-											handleDelete={handleDelete}
-										/>
-									</div>
+									<>
+										{title}
+										<div className={styles.checkbox}>
+											<ButtonEdit
+												id={id}
+												handleEdit={handleEdit}
+											/>
+											<ButtonDelete
+												id={id}
+												isDelete={isDelete}
+												handleDelete={handleDelete}
+											/>
+											<input
+												type="checkbox"
+												checked={completed}
+												onChange={() =>
+													handleCompleted(
+														id,
+														completed,
+													)
+												}
+											/>
+										</div>
+									</>
 								)}
-								<div className={styles.checkbox}>
-									<input
-										type="checkbox"
-										checked={completed}
-										onChange={() =>
-											handleCompleted(id, completed)
-										}
-									/>
-								</div>
 							</div>
 						</div>
 					))

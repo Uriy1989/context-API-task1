@@ -2,12 +2,6 @@
   "todoList": [
     {
       "userId": 1,
-      "title": "",
-      "completed": false,
-      "id": 1
-    },
-    {
-      "userId": 1,
       "id": 2,
       "title": "Нарезать овощи для салата",
       "completed": false
@@ -20,7 +14,7 @@
     },
     {
       "userId": 1,
-      "title": "Сварить соус болоньезе",
+      "title": "Сварить соус болоньезе 2",
       "completed": false,
       "id": 4
     },

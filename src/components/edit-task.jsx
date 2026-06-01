@@ -2,11 +2,15 @@ import styles from '../styles.module.css';
 
 import { useState } from 'react';
 
-export const EditTask = ({ id, isSave, handleSave, handleCancel }) => {
+export const EditTask = ({ id, title, handleSave, handleCancel }) => {
 	//перенести сюда editedTitle, onChangeInput , onBlurInput
 	//editedTitle editedTitle не так переносим
 
-	const [editedTitle, setEditedTitle] = useState('');
+	const [editedTitle, setEditedTitle] = useState(title);
+	const [isSave, setIsSave] = useState(false); //зачем
+
+	//const todoToEdit = todoList.find((todo) => todo.id === id);
+	//setIsSave(false);//можно её не блокировать после нажатия кнопка исчезает
 
 	const onChangeInput = ({ target }) => {
 		const newTitle = target.value;

@@ -2,9 +2,7 @@ import { useEffect, useState, useMemo, useCallback } from 'react';
 import styles from './styles.module.css';
 
 import { useDebounce } from '@uidotdev/usehooks';
-import { useRequestAddTodo } from './hooks';
-import { ButtonSave, ButtonEdit, ButtonDelete, ButtonSort } from './buttons';
-import { EditTask, Task } from './components';
+import { EditTask, Task, ButtonSort } from './components';
 import { TodoListProvider } from './provider/TodoListProvider';
 
 export const TodoList = () => {
@@ -15,20 +13,13 @@ export const TodoList = () => {
 	const [searchPhrase, setSearchPhrase] = useState('');
 	const [sortByTitle, setSortByTitle] = useState('');
 
-	const [isLoading, setIsLoading] = useState(true); //true
-
-	//const [isEdit, setIsEdit] = useState(false); //null editingId editingId
 	const [editingId, setEditingId] = useState(false);
+	const [isLoading, setIsLoading] = useState(true);
 	const [isDelete, setIsDelete] = useState(false);
 
 	const [error, setError] = useState(null);
 
-	const { isCreating, requestAddTodo, handleIsCreating } = useRequestAddTodo(
-		searchPhrase,
-		refreshTodoList,
-	);
-
-	//для серверной части
+	const [isCreating, setIsCreating] = useState(true);
 
 	const debouncedSearchTerm = useDebounce(searchPhrase, 900);
 
@@ -61,7 +52,6 @@ export const TodoList = () => {
 	}, [debouncedSearchTerm, sortByTitle]); //похож на useEffect
 
 	const handleDelete = async (id) => {
-		//requestDeleteTodo(id);
 		setIsDelete(true);
 		try {
 			const response = await fetch(
@@ -119,6 +109,38 @@ export const TodoList = () => {
 		}
 	};
 
+	const handleIsCreating = (value) => {
+		//??
+		setIsCreating(value);
+	};
+
+	const handleAdd = async () => {
+		//refreshTodoList не сработал
+		setSearchPhrase('');
+		setIsCreating(true); //??
+		setError(null);
+
+		try {
+			const response = await fetch('http://localhost:3003/todoList', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json;charset=utf-8' },
+				body: JSON.stringify({
+					title: searchPhrase,
+				}),
+			});
+
+			if (!response.ok) {
+				throw new Error('Ошибка задачи');
+			}
+
+			const data = await response.json();
+			console.log('Задача добавлена, ответ сервера:', data);
+			refreshTodoList();
+		} catch (error) {
+			setError(error.message);
+		}
+	};
+
 	useEffect(() => {
 		getTodos();
 	}, [getTodos]);
@@ -146,7 +168,7 @@ export const TodoList = () => {
 	};
 
 	const handleEdit = (id) => {
-		setEditingId(id); //подумать как будет называться setIsEdit
+		setEditingId(id);
 	};
 
 	const handleCompleted = (id, currentCompleted) => {
@@ -161,11 +183,6 @@ export const TodoList = () => {
 		requestUpdateTodo(id, { completed: !currentCompleted });
 	};
 
-	const handleAdd = () => {
-		requestAddTodo();
-		setSearchPhrase('');
-	};
-
 	if (error) {
 		return (
 			<div>
@@ -173,7 +190,6 @@ export const TodoList = () => {
 			</div>
 		);
 	}
-	//{ id, title, completed }
 	return (
 		<TodoListProvider>
 			<div className={styles.app}>
@@ -219,35 +235,12 @@ export const TodoList = () => {
 											checked={completed}
 											handleCompleted={handleCompleted}
 										/>
-
-										{/* <div className={styles.checkbox}>
-											<ButtonEdit
-												id={id}
-												handleEdit={handleEdit}
-											/>
-											<ButtonDelete
-												id={id}
-												isDelete={isDelete}
-												handleDelete={handleDelete}
-											/>
-											<input
-												type="checkbox"
-												checked={completed}
-												onChange={() =>
-													handleCompleted(
-														id,
-														completed,
-													)
-												}
-											/>
-										</div> */}
 									</>
 								)}
 							</div>
 						</div>
 					))
 				)}
-
 				<ButtonSort
 					handleTitle={handleTitle}
 					sortByTitle={sortByTitle}

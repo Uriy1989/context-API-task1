@@ -1,11 +1,7 @@
 import styles from '../styles.module.css';
-export const ButtonEdit = ({ id, isUpdating, handleEdit }) => {
+export const ButtonEdit = ({ id, handleEdit }) => {
 	return (
-		<button
-			disabled={isUpdating}
-			onClick={() => handleEdit(id)}
-			className={styles.todoButton}
-		>
+		<button onClick={() => handleEdit(id)} className={styles.todoButton}>
 			Редактировать
 		</button>
 	);

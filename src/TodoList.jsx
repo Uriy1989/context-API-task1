@@ -4,7 +4,7 @@ import styles from './styles.module.css';
 import { useDebounce } from '@uidotdev/usehooks';
 import { useRequestAddTodo } from './hooks';
 import { ButtonSave, ButtonEdit, ButtonDelete, ButtonSort } from './buttons';
-import { EditTask } from './components';
+import { EditTask, Task } from './components';
 import { TodoListProvider } from './provider/TodoListProvider';
 
 export const TodoList = () => {
@@ -211,7 +211,16 @@ export const TodoList = () => {
 								) : (
 									<>
 										{title}
-										<div className={styles.checkbox}>
+										<Task
+											id={id}
+											handleEdit={handleEdit}
+											isDelete={isDelete}
+											handleDelete={handleDelete}
+											checked={completed}
+											handleCompleted={handleCompleted}
+										/>
+
+										{/* <div className={styles.checkbox}>
 											<ButtonEdit
 												id={id}
 												handleEdit={handleEdit}
@@ -231,7 +240,7 @@ export const TodoList = () => {
 													)
 												}
 											/>
-										</div>
+										</div> */}
 									</>
 								)}
 							</div>

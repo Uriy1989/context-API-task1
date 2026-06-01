@@ -2,13 +2,10 @@ import { useEffect, useState, useMemo, useCallback } from 'react';
 import styles from './styles.module.css';
 
 import { useDebounce } from '@uidotdev/usehooks';
-import { EditTask, Task, ButtonSort } from './components';
+import { EditTask, Task, ButtonSort, SearchAndAdd } from './components';
 import { TodoListProvider } from './provider/TodoListProvider';
 
 export const TodoList = () => {
-	const refreshTodoList = () => setRefreshTodoListFlag(!refreshTodoListFlag);
-
-	const [refreshTodoListFlag, setRefreshTodoListFlag] = useState(false);
 	const [todoList, setTodoList] = useState([]);
 	const [searchPhrase, setSearchPhrase] = useState('');
 	const [sortByTitle, setSortByTitle] = useState('');
@@ -19,7 +16,7 @@ export const TodoList = () => {
 
 	const [error, setError] = useState(null);
 
-	const [isCreating, setIsCreating] = useState(true);
+	const [isCreating, setIsCreating] = useState(false);
 
 	const debouncedSearchTerm = useDebounce(searchPhrase, 900);
 
@@ -71,8 +68,6 @@ export const TodoList = () => {
 			setTodoList((prevState) =>
 				prevState.filter((todo) => todo.id !== id),
 			);
-
-			refreshTodoList();
 		} catch (error) {
 			setError(error.message);
 		} finally {
@@ -98,7 +93,6 @@ export const TodoList = () => {
 			}
 			const data = await response.json();
 
-			//refreshTodoList
 			setTodoList((prevState) =>
 				prevState.map((todo) => (todo.id === id ? data : todo)),
 			);
@@ -109,15 +103,9 @@ export const TodoList = () => {
 		}
 	};
 
-	const handleIsCreating = (value) => {
-		//??
-		setIsCreating(value);
-	};
-
 	const handleAdd = async () => {
-		//refreshTodoList не сработал
 		setSearchPhrase('');
-		setIsCreating(true); //??
+		setIsCreating(true);
 		setError(null);
 
 		try {
@@ -135,7 +123,9 @@ export const TodoList = () => {
 
 			const data = await response.json();
 			console.log('Задача добавлена, ответ сервера:', data);
-			refreshTodoList();
+
+			setTodoList((prevState) => [...prevState, data]); //подумать
+			setIsCreating(false);
 		} catch (error) {
 			setError(error.message);
 		}
@@ -145,18 +135,12 @@ export const TodoList = () => {
 		getTodos();
 	}, [getTodos]);
 
-	const onSearchChange = ({ target }) => {
-		if (target.value.length < 1) {
-			handleIsCreating(true);
-		} else {
-			handleIsCreating(false);
-		}
-
-		setSearchPhrase(target.value);
+	const handleSearchPhrase = (value) => {
+		setSearchPhrase(value);
 	};
 
-	const onSearchBlur = ({ target }) => {
-		setSearchPhrase(target.value);
+	const handleIsCreating = (value) => {
+		setIsCreating(value);
 	};
 
 	const handleCancel = () => {
@@ -171,16 +155,12 @@ export const TodoList = () => {
 		setEditingId(id);
 	};
 
-	const handleCompleted = (id, currentCompleted) => {
-		setTodoList((newList) =>
-			newList.map((todo) =>
-				todo.id === id
-					? { ...todo, completed: !currentCompleted }
-					: todo,
-			),
-		);
-
-		requestUpdateTodo(id, { completed: !currentCompleted });
+	const handleCompleted = async (id, currentCompleted) => {
+		try {
+			await handleSave(id, { completed: !currentCompleted });
+		} catch (error) {
+			setError(error.message); //???
+		}
 	};
 
 	if (error) {
@@ -193,24 +173,13 @@ export const TodoList = () => {
 	return (
 		<TodoListProvider>
 			<div className={styles.app}>
-				<div className={styles.containerTodoList}>
-					<input
-						className={styles.input}
-						name="search"
-						type="text"
-						placeholder="Поиск и добавление новой задачи"
-						value={searchPhrase}
-						onChange={onSearchChange}
-						onBlur={onSearchBlur}
-					/>
-					<button
-						disabled={isCreating}
-						onClick={handleAdd}
-						className={styles.todoButton}
-					>
-						Добавить+
-					</button>
-				</div>
+				<SearchAndAdd
+					searchPhrase={searchPhrase}
+					handleAdd={handleAdd}
+					isCreating={isCreating}
+					handleIsCreating={handleIsCreating}
+					handleSearchPhrase={handleSearchPhrase}
+				/>
 				{isLoading ? (
 					<div className={styles.loader}></div>
 				) : (
@@ -232,7 +201,7 @@ export const TodoList = () => {
 											handleEdit={handleEdit}
 											isDelete={isDelete}
 											handleDelete={handleDelete}
-											checked={completed}
+											completed={completed}
 											handleCompleted={handleCompleted}
 										/>
 									</>

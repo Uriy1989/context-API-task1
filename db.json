@@ -3,8 +3,8 @@
     {
       "userId": 1,
       "id": 2,
-      "title": "Нарезать овощи для салата",
-      "completed": false
+      "title": "Нарезать овощи для салата1",
+      "completed": true
     },
     {
       "userId": 1,

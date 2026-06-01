@@ -15,11 +15,7 @@ function App() {
 			</div>
 
 			<div className={styles.block}></div>
-			<div>
-				<h3>Меню</h3>
-
-				<TodoList />
-			</div>
+			<TodoList />
 		</>
 	);
 }

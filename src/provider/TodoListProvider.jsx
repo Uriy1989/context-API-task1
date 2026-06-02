@@ -24,7 +24,7 @@ export const TodoListProvider = ({ children }) => {
 
 	const [searchPhrase, setSearchPhrase] = useState('');
 	const [sortByTitle, setSortByTitle] = useState('');
-	const [editingId, setEditingId] = useState(false);
+	const [editingId, setEditingId] = useState(null);
 
 	const debouncedSearchTerm = useDebounce(searchPhrase, 900);
 
@@ -106,14 +106,19 @@ export const TodoListProvider = ({ children }) => {
 				prevState.map((todo) => (todo.id === id ? data : todo)),
 			);
 
-			//setEditingId(null);//переместить в, как его перенести
+			handleEditId(null);
+			console.log('сохранил');
 		} catch (error) {
 			setError(error.message);
 		}
 	};
 
+	const handleEditId = (value) => {
+		setEditingId(value);
+	};
+
 	const handleAdd = async () => {
-		//setSearchPhrase(''); очистится сам после обновления
+		setSearchPhrase('');
 		setIsCreating(true);
 		setError(null);
 
@@ -153,7 +158,7 @@ export const TodoListProvider = ({ children }) => {
 	};
 
 	const handleCancel = () => {
-		setEditingId(null);
+		handleEditId(null);
 	};
 
 	const handleTitle = (order) => {
@@ -161,7 +166,7 @@ export const TodoListProvider = ({ children }) => {
 	};
 
 	const handleEdit = (id) => {
-		setEditingId(id);
+		handleEditId(id);
 	};
 
 	const handleCompleted = async (id, currentCompleted) => {
@@ -190,6 +195,7 @@ export const TodoListProvider = ({ children }) => {
 				handleTitle,
 				handleEdit,
 				handleCompleted,
+				handleEditId,
 			}}
 		>
 			{children}

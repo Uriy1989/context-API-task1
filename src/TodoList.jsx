@@ -18,15 +18,18 @@ export const TodoList = () => {
 
 		getTodos,
 		handleDelete,
-		handleSave,
+
 		handleAdd,
 		handleSearchPhrase,
 		handleIsCreating,
-		handleCancel,
+
 		handleTitle,
 		handleEdit,
 		handleCompleted,
+		handleEditId,
 	} = useTodoList();
+	//handleSave,
+	//handleCancel,
 
 	if (error) {
 		return (
@@ -53,12 +56,7 @@ export const TodoList = () => {
 						<div className={styles.containerTodoList} key={id}>
 							<div className={styles.Todo}>
 								{editingId === id ? (
-									<EditTask
-										id={id}
-										title={title}
-										handleSave={handleSave}
-										handleCancel={handleCancel}
-									/>
+									<EditTask id={id} title={title} />
 								) : (
 									<>
 										{title}

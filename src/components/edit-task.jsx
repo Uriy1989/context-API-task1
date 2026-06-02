@@ -1,10 +1,10 @@
 import styles from '../styles.module.css';
 
 import { useState } from 'react';
+import { useTodoList } from '../provider/TodoListProvider';
 
-export const EditTask = ({ id, title, handleSave, handleCancel }) => {
-	//перенести сюда editedTitle, onChangeInput , onBlurInput
-	//editedTitle editedTitle не так переносим
+export const EditTask = ({ id, title }) => {
+	const { handleSave, handleCancel, editingId } = useTodoList();
 
 	const [editedTitle, setEditedTitle] = useState(title);
 	const [isSave, setIsSave] = useState(false); //зачем
@@ -29,37 +29,47 @@ export const EditTask = ({ id, title, handleSave, handleCancel }) => {
 		}
 	};
 
+	console.log('editingId', editingId, 'id', id);
+
 	return (
 		<>
-			<input
-				className={styles.input}
-				name="edit"
-				type="text"
-				placeholder="Внесите новую задачу"
-				value={editedTitle}
-				onChange={onChangeInput}
-				onBlur={onBlurInput}
-				autoFocus
-			/>
-			<div>
-				<button
-					disabled={isSave}
-					onClick={() => handleSave(id, { title: editedTitle })}
-					className={styles.todoButton}
-				>
-					Сохранить
-				</button>
-				<button
-					onClick={() => handleCancel()}
-					className={styles.todoButton}
-				>
-					Отмена
-				</button>
-			</div>
+			{editingId !== id ? (
+				<>
+					<input
+						className={styles.input}
+						name="edit"
+						type="text"
+						placeholder="Внесите новую задачу"
+						value={editedTitle}
+						onChange={onChangeInput}
+						onBlur={onBlurInput}
+						autoFocus
+					/>
+					<div>
+						<button
+							disabled={isSave}
+							onClick={() =>
+								handleSave(id, { title: editedTitle })
+							}
+							className={styles.todoButton}
+						>
+							Сохранить
+						</button>
+						<button
+							onClick={() => handleCancel()}
+							className={styles.todoButton}
+						>
+							Отмена
+						</button>
+					</div>
+				</>
+			) : (
+				'пусто'
+			)}
 		</>
 	);
 };
-
+//
 // <ButtonSave
 // 	id={id}
 // 	isSave={isSave}

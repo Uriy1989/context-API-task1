@@ -7,7 +7,6 @@ import { useDebounce } from '@uidotdev/usehooks';
 import { useEffect, useState, useCallback } from 'react';
 
 export const useTodoList = () => {
-	//useTodoListContext
 	const context = useContext(TodoListContext);
 	if (!context) {
 		throw new Error('нет контекста');
@@ -24,13 +23,10 @@ export const TodoListProvider = ({ children }) => {
 
 	const [searchPhrase, setSearchPhrase] = useState('');
 	const [sortByTitle, setSortByTitle] = useState('');
-	const [editingId, setEditingId] = useState(null);
 
 	const debouncedSearchTerm = useDebounce(searchPhrase, 900);
 
 	const getTodos = useCallback(async () => {
-		//не перемещаем в провайдер???
-		//обновляет функцию если что то изменилось из массива
 		setIsLoading(true);
 		let url = 'http://localhost:3003/todoList?';
 
@@ -44,7 +40,7 @@ export const TodoListProvider = ({ children }) => {
 			//сортировка на сервере // сортировка должна работать по условию
 			url += `&_sort=title&_order=${sortByTitle}`;
 		}
-		//views это поля по которому сортируемся, ?_sort или
+		//views это поля по которому сорбируется, ?_sort или
 
 		try {
 			const response = await fetch(url);
@@ -106,15 +102,10 @@ export const TodoListProvider = ({ children }) => {
 				prevState.map((todo) => (todo.id === id ? data : todo)),
 			);
 
-			handleEditId(null);
 			console.log('сохранил');
 		} catch (error) {
 			setError(error.message);
 		}
-	};
-
-	const handleEditId = (value) => {
-		setEditingId(value);
 	};
 
 	const handleAdd = async () => {
@@ -157,17 +148,9 @@ export const TodoListProvider = ({ children }) => {
 		setIsCreating(value);
 	};
 
-	const handleCancel = () => {
-		handleEditId(null);
-	};
-
 	const handleTitle = (order) => {
 		setSortByTitle(order);
 	};
-
-	// const handleEdit = (id) => {
-	// 	handleEditId(id);
-	// };
 
 	const handleCompleted = async (id, currentCompleted) => {
 		await handleSave(id, { completed: !currentCompleted });
@@ -183,18 +166,14 @@ export const TodoListProvider = ({ children }) => {
 				error,
 				searchPhrase,
 				sortByTitle,
-				editingId,
-
 				getTodos,
 				handleDelete,
 				handleSave,
 				handleAdd,
 				handleSearchPhrase,
 				handleIsCreating,
-				handleCancel,
 				handleTitle,
 				handleCompleted,
-				handleEditId,
 			}}
 		>
 			{children}

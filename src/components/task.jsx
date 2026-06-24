@@ -1,16 +1,13 @@
 import styles from '../styles.module.css';
 
-import { useState } from 'react';
-import { useTodoList } from '../provider/TodoListProvider';
-
 export const Task = ({
 	id,
 	isDelete,
 	handleDelete,
 	completed,
 	handleCompleted,
+	handleEditId,
 }) => {
-	const { handleEditId } = useTodoList();
 	return (
 		<>
 			<div className={styles.checkbox}>

@@ -13,8 +13,6 @@ function App() {
 			<div className={styles.H3}>
 				<h3>Список задач:</h3>
 			</div>
-
-			<div className={styles.block}></div>
 			<TodoList />
 		</>
 	);

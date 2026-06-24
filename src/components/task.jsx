@@ -1,20 +1,21 @@
 import styles from '../styles.module.css';
 
 import { useState } from 'react';
+import { useTodoList } from '../provider/TodoListProvider';
 
 export const Task = ({
 	id,
-	handleEdit,
 	isDelete,
 	handleDelete,
 	completed,
 	handleCompleted,
 }) => {
+	const { handleEditId } = useTodoList();
 	return (
 		<>
 			<div className={styles.checkbox}>
 				<button
-					onClick={() => handleEdit(id)}
+					onClick={() => handleEditId(id)}
 					className={styles.todoButton}
 				>
 					Редактировать

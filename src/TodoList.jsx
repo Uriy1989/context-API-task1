@@ -24,7 +24,6 @@ export const TodoList = () => {
 		handleIsCreating,
 
 		handleTitle,
-		handleEdit,
 		handleCompleted,
 		handleEditId,
 	} = useTodoList();
@@ -62,7 +61,6 @@ export const TodoList = () => {
 										{title}
 										<Task
 											id={id}
-											handleEdit={handleEdit}
 											isDelete={isDelete}
 											handleDelete={handleDelete}
 											completed={completed}

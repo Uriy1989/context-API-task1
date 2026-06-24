@@ -165,9 +165,9 @@ export const TodoListProvider = ({ children }) => {
 		setSortByTitle(order);
 	};
 
-	const handleEdit = (id) => {
-		handleEditId(id);
-	};
+	// const handleEdit = (id) => {
+	// 	handleEditId(id);
+	// };
 
 	const handleCompleted = async (id, currentCompleted) => {
 		await handleSave(id, { completed: !currentCompleted });
@@ -193,7 +193,6 @@ export const TodoListProvider = ({ children }) => {
 				handleIsCreating,
 				handleCancel,
 				handleTitle,
-				handleEdit,
 				handleCompleted,
 				handleEditId,
 			}}

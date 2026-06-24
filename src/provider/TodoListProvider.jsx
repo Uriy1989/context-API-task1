@@ -28,19 +28,16 @@ export const TodoListProvider = ({ children }) => {
 
 	const getTodos = useCallback(async () => {
 		setIsLoading(true);
-		let url = 'http://localhost:3003/todoList?';
+		let url = new URL('http://localhost:3003/todoList');
 
 		if (debouncedSearchTerm) {
-			console.log('debouncedSearchTerm =', debouncedSearchTerm);
-			//можно через хук реакт роутера???
-			url += `q=${debouncedSearchTerm}`;
+			url.searchParams.set('q', debouncedSearchTerm);
 		}
 
 		if (sortByTitle) {
-			//сортировка на сервере // сортировка должна работать по условию
-			url += `&_sort=title&_order=${sortByTitle}`;
+			url.searchParams.set('_sort', 'title');
+			url.searchParams.set('_order', sortByTitle);
 		}
-		//views это поля по которому сорбируется, ?_sort или
 
 		try {
 			const response = await fetch(url);
@@ -48,10 +45,20 @@ export const TodoListProvider = ({ children }) => {
 
 			setTodoList(data);
 			setIsLoading(false);
+			if (!response.ok) {
+				throw new Error(
+					`Network response was not ok ${response.status}`,
+				);
+			}
 		} catch (error) {
+			if (error.message.includes('Failed to fetch')) {
+				error.message =
+					'Нет соединения с сервером. Запустите JSON Server.';
+			}
+			setError(error.message);
 			setIsLoading(false);
 		}
-	}, [debouncedSearchTerm, sortByTitle]); //похож на useEffect
+	}, [debouncedSearchTerm, sortByTitle]);
 
 	const handleDelete = async (id) => {
 		setIsDelete(true);
@@ -129,7 +136,7 @@ export const TodoListProvider = ({ children }) => {
 			const data = await response.json();
 			console.log('Задача добавлена, ответ сервера:', data);
 
-			setTodoList((prevState) => [...prevState, data]); //подумать
+			setTodoList((prevState) => [...prevState, data]);
 			setIsCreating(false);
 		} catch (error) {
 			setError(error.message);

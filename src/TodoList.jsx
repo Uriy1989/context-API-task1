@@ -5,7 +5,7 @@ import { useDebounce } from '@uidotdev/usehooks';
 import { EditTask, Task, ButtonSort, SearchAndAdd } from './components';
 
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchTodos } from './actions/fetch-todos';
+import { fetchTodos, addTodo, updateTodo, deleteTodo } from './actions';
 
 export const TodoList = () => {
 	// 	const {
@@ -64,88 +64,103 @@ export const TodoList = () => {
 		getTodos();
 	}, [getTodos]);
 
-	const handleDelete = async (id) => {
-		setIsDelete(true);
-		try {
-			const response = await fetch(
-				`http://localhost:3003/todoList/${id}`,
-				{
-					method: 'DELETE',
-					headers: {
-						'Content-Type': 'application/json;charset=utf-8',
-					},
-				},
-			);
-
-			if (!response.ok) {
-				throw new Error('Network response was not ok');
-			}
-
-			setTodoList((prevState) =>
-				prevState.filter((todo) => todo.id !== id),
-			);
-		} catch (error) {
-			setError(error.message);
-		} finally {
-			setIsDelete(false);
-		}
+	const handleDelete = (id) => {
+		dispatch(deleteTodo(id));
 	};
 
-	const handleSave = async (id, payload) => {
-		try {
-			const response = await fetch(
-				`http://localhost:3003/todoList/${id}`,
-				{
-					method: 'PATCH',
-					headers: {
-						'Content-Type': 'application/json;charset=utf-8',
-					},
-					body: JSON.stringify(payload),
-				},
-			);
-
-			if (!response.ok) {
-				throw new Error('Ошибка обновления');
-			}
-			const data = await response.json();
-
-			setTodoList((prevState) =>
-				prevState.map((todo) => (todo.id === id ? data : todo)),
-			);
-
-			console.log('сохранил');
-		} catch (error) {
-			setError(error.message);
-		}
+	const handleSave = (id, payload) => {
+		dispatch(updateTodo(id, payload));
 	};
 
-	const handleAdd = async () => {
-		setSearchPhrase('');
+	const handleAdd = () => {
+		if (!searchPhrase.trim()) return;
 		setIsCreating(true);
-		setError(null);
-
-		try {
-			const response = await fetch('http://localhost:3003/todoList', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json;charset=utf-8' },
-				body: JSON.stringify({
-					title: searchPhrase,
-				}),
-			});
-
-			if (!response.ok) {
-				throw new Error('Ошибка задачи');
-			}
-
-			const data = await response.json();
-			console.log('Задача добавлена, ответ сервера:', data);
-
-			setTodoList((prevState) => [...prevState, data]);
-			setIsCreating(false);
-		} catch (error) {
-			setError(error.message);
-		}
+		dispatch(addTodo(searchPhrase));
+		setSearchPhrase(''); // сброс поля ввода
 	};
+
+	// const handleDelete = async (id) => {
+	// 	setIsDelete(true);
+	// 	try {
+	// 		const response = await fetch(
+	// 			`http://localhost:3003/todoList/${id}`,
+	// 			{
+	// 				method: 'DELETE',
+	// 				headers: {
+	// 					'Content-Type': 'application/json;charset=utf-8',
+	// 				},
+	// 			},
+	// 		);
+
+	// 		if (!response.ok) {
+	// 			throw new Error('Network response was not ok');
+	// 		}
+
+	// 		setTodoList((prevState) =>
+	// 			prevState.filter((todo) => todo.id !== id),
+	// 		);
+	// 	} catch (error) {
+	// 		setError(error.message);
+	// 	} finally {
+	// 		setIsDelete(false);
+	// 	}
+	// };
+
+	// const handleSave = async (id, payload) => {
+	// 	try {
+	// 		const response = await fetch(
+	// 			`http://localhost:3003/todoList/${id}`,
+	// 			{
+	// 				method: 'PATCH',
+	// 				headers: {
+	// 					'Content-Type': 'application/json;charset=utf-8',
+	// 				},
+	// 				body: JSON.stringify(payload),
+	// 			},
+	// 		);
+
+	// 		if (!response.ok) {
+	// 			throw new Error('Ошибка обновления');
+	// 		}
+	// 		const data = await response.json();
+
+	// 		setTodoList((prevState) =>
+	// 			prevState.map((todo) => (todo.id === id ? data : todo)),
+	// 		);
+
+	// 		console.log('сохранил');
+	// 	} catch (error) {
+	// 		setError(error.message);
+	// 	}
+	// };
+
+	// const handleAdd = async () => {
+	// 	setSearchPhrase('');
+	// 	setIsCreating(true);
+	// 	setError(null);
+
+	// 	try {
+	// 		const response = await fetch('http://localhost:3003/todoList', {
+	// 			method: 'POST',
+	// 			headers: { 'Content-Type': 'application/json;charset=utf-8' },
+	// 			body: JSON.stringify({
+	// 				title: searchPhrase,
+	// 			}),
+	// 		});
+
+	// 		if (!response.ok) {
+	// 			throw new Error('Ошибка задачи');
+	// 		}
+
+	// 		const data = await response.json();
+	// 		console.log('Задача добавлена, ответ сервера:', data);
+
+	// 		setTodoList((prevState) => [...prevState, data]);
+	// 		setIsCreating(false);
+	// 	} catch (error) {
+	// 		setError(error.message);
+	// 	}
+	// };
 
 	const handleSearchPhrase = (value) => {
 		setSearchPhrase(value);

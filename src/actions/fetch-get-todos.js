@@ -5,7 +5,7 @@ export const fetchTodos =
 	async (dispatch) => {
 		dispatch({ type: 'GET_TODOS_REQUEST' });
 		try {
-			const data = await serverAPI('GET', '', null, query);
+			const data = await serverAPI('GET', '', null, query); //если сервер api с ошибкой то выполняется catch
 			dispatch({
 				type: 'GET_TODOS_SUCCESS',
 				payload: data,

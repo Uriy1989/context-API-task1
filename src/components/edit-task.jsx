@@ -1,10 +1,10 @@
 import styles from '../styles.module.css';
 
 import { useState } from 'react';
-import { useTodoList } from '../provider/TodoListProvider';
+//import { useTodoList } from '../provider/TodoListProvider';
 
 export const EditTask = ({ id, title, handleEditId }) => {
-	const { handleSave } = useTodoList();
+	//const { handleSave } = useTodoList();
 
 	const [editedTitle, setEditedTitle] = useState(title);
 	const [isLoading, setIsLoading] = useState(false);

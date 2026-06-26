@@ -1,35 +1,26 @@
 import styles from '../styles.module.css';
 
 import { useState } from 'react';
-//import { useTodoList } from '../provider/TodoListProvider';
+
+import { useSelector, useDispatch } from 'react-redux';
+import { updateTodo } from '../actions';
 
 export const EditTask = ({ id, title, handleEditId }) => {
 	//const { handleSave } = useTodoList();
 
+	const dispatch = useDispatch();
+	const { isLoading } = useSelector((state) => state.serverState);
 	const [editedTitle, setEditedTitle] = useState(title);
-	const [isLoading, setIsLoading] = useState(false);
 
 	const onChangeInput = (e) => setEditedTitle(e.target.value);
 
-	const onSave = async () => {
+	const onSave = () => {
 		if (!editedTitle.trim()) return;
-
-		setIsLoading(true);
-		try {
-			await handleSave(id, { title: editedTitle });
-
-			console.log('handleEditId = ', handleEditId);
-			handleEditId(null);
-		} catch (error) {
-			console.error('Ошибка сохранения', error);
-			alert('Не удалось сохранить задачу');
-		} finally {
-			setIsLoading(false);
-		}
+		dispatch(updateTodo(id, { title: editedTitle }));
+		handleEditId(null);
 	};
 
 	const onBlurInput = ({ target }) => {
-		//блок для кнопки сохранить ???
 		const newTitle = target.value;
 	};
 	const onCancel = () => {

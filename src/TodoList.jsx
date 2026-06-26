@@ -8,37 +8,13 @@ import { useSelector, useDispatch } from 'react-redux';
 import { fetchTodos, addTodo, updateTodo, deleteTodo } from './actions';
 
 export const TodoList = () => {
-	// 	const {
-	// 		todoList,
-	// 		isDelete,
-	// 		isLoading,
-	// 		isCreating,
-	// 		error,
-	// 		searchPhrase,
-	// 		sortByTitle,
-	// 		getTodos,
-	// 		handleDelete,
-	// 		handleAdd,
-	// 		handleSearchPhrase,
-	// 		handleIsCreating,
-	// 		handleTitle,
-	// 		handleCompleted,
-	// 	} = useTodoList();
-
 	const dispatch = useDispatch();
 	const { todoList, isLoading, error } = useSelector(
 		(state) => state.serverState,
 	);
 
-	//const [error, setError] = useState(null);
-	//const [todoList, setTodoList] = useState([]);
-	const [isDelete, setIsDelete] = useState(false);
-	//const [isLoading, setIsLoading] = useState(true);
-	const [isCreating, setIsCreating] = useState(false);
-
 	const [searchPhrase, setSearchPhrase] = useState('');
 	const [sortByTitle, setSortByTitle] = useState('');
-
 	const debouncedSearchTerm = useDebounce(searchPhrase, 900);
 
 	// Этот useCallback теперь только формирует параметры и вызывает dispatch
@@ -60,122 +36,20 @@ export const TodoList = () => {
 	}, [debouncedSearchTerm, sortByTitle, dispatch]);
 
 	useEffect(() => {
-		// При монтировании загружаем начальные данные
 		getTodos();
 	}, [getTodos]);
-
-	const handleDelete = (id) => {
-		dispatch(deleteTodo(id));
-	};
-
-	const handleSave = (id, payload) => {
-		dispatch(updateTodo(id, payload));
-	};
-
-	const handleAdd = () => {
-		if (!searchPhrase.trim()) return;
-		setIsCreating(true);
-		dispatch(addTodo(searchPhrase));
-		setSearchPhrase(''); // сброс поля ввода
-	};
-
-	// const handleDelete = async (id) => {
-	// 	setIsDelete(true);
-	// 	try {
-	// 		const response = await fetch(
-	// 			`http://localhost:3003/todoList/${id}`,
-	// 			{
-	// 				method: 'DELETE',
-	// 				headers: {
-	// 					'Content-Type': 'application/json;charset=utf-8',
-	// 				},
-	// 			},
-	// 		);
-
-	// 		if (!response.ok) {
-	// 			throw new Error('Network response was not ok');
-	// 		}
-
-	// 		setTodoList((prevState) =>
-	// 			prevState.filter((todo) => todo.id !== id),
-	// 		);
-	// 	} catch (error) {
-	// 		setError(error.message);
-	// 	} finally {
-	// 		setIsDelete(false);
-	// 	}
-	// };
-
-	// const handleSave = async (id, payload) => {
-	// 	try {
-	// 		const response = await fetch(
-	// 			`http://localhost:3003/todoList/${id}`,
-	// 			{
-	// 				method: 'PATCH',
-	// 				headers: {
-	// 					'Content-Type': 'application/json;charset=utf-8',
-	// 				},
-	// 				body: JSON.stringify(payload),
-	// 			},
-	// 		);
-
-	// 		if (!response.ok) {
-	// 			throw new Error('Ошибка обновления');
-	// 		}
-	// 		const data = await response.json();
-
-	// 		setTodoList((prevState) =>
-	// 			prevState.map((todo) => (todo.id === id ? data : todo)),
-	// 		);
-
-	// 		console.log('сохранил');
-	// 	} catch (error) {
-	// 		setError(error.message);
-	// 	}
-	// };
-
-	// const handleAdd = async () => {
-	// 	setSearchPhrase('');
-	// 	setIsCreating(true);
-	// 	setError(null);
-
-	// 	try {
-	// 		const response = await fetch('http://localhost:3003/todoList', {
-	// 			method: 'POST',
-	// 			headers: { 'Content-Type': 'application/json;charset=utf-8' },
-	// 			body: JSON.stringify({
-	// 				title: searchPhrase,
-	// 			}),
-	// 		});
-
-	// 		if (!response.ok) {
-	// 			throw new Error('Ошибка задачи');
-	// 		}
-
-	// 		const data = await response.json();
-	// 		console.log('Задача добавлена, ответ сервера:', data);
-
-	// 		setTodoList((prevState) => [...prevState, data]);
-	// 		setIsCreating(false);
-	// 	} catch (error) {
-	// 		setError(error.message);
-	// 	}
-	// };
 
 	const handleSearchPhrase = (value) => {
 		setSearchPhrase(value);
 	};
 
-	const handleIsCreating = (value) => {
-		setIsCreating(value);
-	};
+	// const handleIsCreating = (value) => {
+	// 	setIsCreating(value);
+	// };
 
 	const handleTitle = (order) => {
+		//проверить потом
 		setSortByTitle(order);
-	};
-
-	const handleCompleted = async (id, currentCompleted) => {
-		await handleSave(id, { completed: !currentCompleted });
 	};
 
 	//old
@@ -197,9 +71,6 @@ export const TodoList = () => {
 		<div className={styles.app}>
 			<SearchAndAdd
 				searchPhrase={searchPhrase}
-				handleAdd={handleAdd}
-				isCreating={isCreating}
-				handleIsCreating={handleIsCreating}
 				handleSearchPhrase={handleSearchPhrase}
 			/>
 			{isLoading ? (
@@ -219,10 +90,10 @@ export const TodoList = () => {
 									{title}
 									<Task
 										id={id}
-										isDelete={isDelete}
-										handleDelete={handleDelete}
+										// isDelete={isDelete}
+										// handleDelete={handleDelete}
 										completed={completed}
-										handleCompleted={handleCompleted}
+										// handleCompleted={handleCompleted}
 										handleEditId={handleEditId}
 									/>
 								</>

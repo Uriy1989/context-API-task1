@@ -6,7 +6,7 @@ export const deleteTodo = (id) => async (dispatch) => {
 		await serverAPI('DELETE', id);
 		dispatch({
 			type: 'DELETE_TODO_SUCCESS',
-			payload: id, // передаём id, reducer удалит по нему
+			payload: id,
 		});
 	} catch (error) {
 		dispatch({

@@ -5,7 +5,7 @@ export const updateTodo = (id, payload) => async (dispatch) => {
 		const data = await serverAPI('SAVE', id, payload);
 		dispatch({
 			type: 'UPDATE_TODO_SUCCESS',
-			payload: data, // сервер обычно возвращает обновлённую задачу
+			payload: data,
 		});
 	} catch (error) {
 		dispatch({

@@ -6,8 +6,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import { updateTodo } from '../actions';
 
 export const EditTask = ({ id, title, handleEditId }) => {
-	//const { handleSave } = useTodoList();
-
 	const dispatch = useDispatch();
 	const { isLoading } = useSelector((state) => state.serverState);
 	const [editedTitle, setEditedTitle] = useState(title);

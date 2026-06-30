@@ -3,14 +3,7 @@ import styles from '../styles.module.css';
 import { useSelector, useDispatch } from 'react-redux';
 import { addTodo, updateTodo, deleteTodo } from '../actions';
 
-export const Task = ({
-	id,
-	// isDelete,
-	// handleDelete,
-	completed,
-	// handleCompleted,
-	handleEditId,
-}) => {
+export const Task = ({ id, completed, handleEditId }) => {
 	const dispatch = useDispatch();
 	const { isLoading } = useSelector((state) => state.serverState);
 

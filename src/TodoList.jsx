@@ -17,7 +17,6 @@ export const TodoList = () => {
 	const [sortByTitle, setSortByTitle] = useState('');
 	const debouncedSearchTerm = useDebounce(searchPhrase, 900);
 
-	// Этот useCallback теперь только формирует параметры и вызывает dispatch
 	const getTodos = useCallback(() => {
 		const params = new URLSearchParams();
 
@@ -43,16 +42,10 @@ export const TodoList = () => {
 		setSearchPhrase(value);
 	};
 
-	// const handleIsCreating = (value) => {
-	// 	setIsCreating(value);
-	// };
-
 	const handleTitle = (order) => {
-		//проверить потом
 		setSortByTitle(order);
 	};
 
-	//old
 	const [editingId, setEditingId] = useState(null);
 
 	const handleEditId = (value) => {
@@ -90,10 +83,7 @@ export const TodoList = () => {
 									{title}
 									<Task
 										id={id}
-										// isDelete={isDelete}
-										// handleDelete={handleDelete}
 										completed={completed}
-										// handleCompleted={handleCompleted}
 										handleEditId={handleEditId}
 									/>
 								</>

@@ -11,18 +11,12 @@ export const SearchAndAdd = ({ searchPhrase, handleSearchPhrase }) => {
 	const { isLoading } = useSelector((state) => state.serverState);
 
 	const onAdd = () => {
-		if (!searchPhrase.trim()) return; //добавить это в thunk или dispatch addTodo
+		if (!searchPhrase.trim()) return;
 		dispatch(addTodo(searchPhrase));
-		handleSearchPhrase(''); // сброс поля ввода
+		handleSearchPhrase('');
 	};
 
 	const onSearchChange = ({ target }) => {
-		if (target.value.length < 1) {
-			//	setIsCreating(true); //isLoading если поле пустое searchPhrase пуст то ошибку вызываем???
-		} else {
-			//	setIsCreating(false); //isLoading
-		}
-
 		handleSearchPhrase(target.value);
 	};
 
